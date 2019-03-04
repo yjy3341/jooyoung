@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="review">
+
+<!-- 리뷰 저장 -->
+<insert id="register" parameterType="Review">
+	insert into review(rvno, bno, id, nickname, reviewtext, rating)
+	values(reviewseq.nextval, #{bno}, #{id}, #{nickname}, #{reviewtext}, #{rating})
+</insert>
+
+<!-- 리뷰 목록 -->
+<select id="review" parameterType="java.lang.Integer" resultType="Review">
+	select *
+	from review
+	where bno = #{bno}
+</select>
+
+<!-- 댓글 삭제 -->
+<delete id="delete" parameterType="java.lang.Integer">
+	delete from review
+	where rvno = #{rvno}
+</delete>
+
+<!-- 댓글 수정 -->
+<update id="update" parameterType="Reply">
+	update review
+	set replytext = #{replytext}, regdate = sysdate
+	where rvno = #{rvno}
+</update>
+</mapper>

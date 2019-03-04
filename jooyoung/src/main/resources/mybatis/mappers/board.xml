@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+<!-- 공통으로 사용할 SQL-->
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">
+				where title like '%' || #{keyword} || '%'
+			</if>
+			<if test="searchType == 'c'.toString()">
+				where content like '%' || #{keyword} || '%'
+			</if>
+			<if test="searchType == 'tc'.toString()">
+				where title like '%' || #{keyword} || '%' or
+				content like '%' || #{keyword} || '%'
+			</if>			
+		</if>
+	</sql>
+<!-- 글 쓰기 -->
+<insert id="register" parameterType="Board">
+	insert into board(bno, title, content, id, nickname, image, genre)
+	values(boardseq.nextval, #{title}, #{content}, #{id}, #{nickname}, 
+		   #{image}, #{genre})
+</insert>
+
+<!-- 글 목록 가져오기 -->
+<!-- <select id="board" resultType="Board">
+	select bno, title, nickname, regdate, readcnt, id, image
+	from board
+</select>
+ -->
+<!-- 글 목록 가져오기 -->
+<select id="board" resultType="Board" parameterType="SearchCriteria">
+	select bno, title, nickname, regdate, readcnt, id, image, genre
+	from (select rownum rnum, bno, title, nickname, regdate, readcnt, id, image, genre
+		  from(select * 
+		  	   from board 
+		  	   <include refid="search"></include>
+		  	   order by regdate desc)
+		  	   )
+		  	   <!-- rownum =  출력되는 결과물에 순차적인 번호를 달아주는 기능입니다.  -->
+		  	   	 <!-- >= -->
+		  where rnum &gt;= #{pageStart} and 
+		  		 <!-- <= -->
+		        rnum &lt;= #{pageStart} + #{perPageNum} -1
+		  
+</select>
+
+
+<!-- 상세보기 (조회수 1증가) -->
+<update id="updatecnt" parameterType="java.lang.Integer">
+	update board
+	set readcnt = readcnt + 1
+	where bno = #{bno}
+</update>
+
+<!-- 상세보기(글 번호에 해당하는 데이터 가져오기) -->
+<select id="detail" parameterType="java.lang.Integer" resultType="Board">
+	select * 
+	from board
+	where bno = #{bno}
+</select>
+
+<!-- 게시글 수정 -->
+<update id="update" parameterType="Board">
+	update board
+	set title = #{title}, content = #{content}, regdate = sysdate
+	where bno = #{bno}
+</update>
+
+<!-- 게시글 삭제 -->
+<delete id="delete" parameterType="java.lang.Integer">
+	delete from board
+	where bno = #{bno}
+</delete>
+
+<!-- 전체 게시글 개수 가져오기 -->
+<!-- <select id="totalcount" resultType="java.lang.Integer">
+	select count(*)
+	from board
+</select>
+ -->
+ 
+ <!-- 전체 게시글 개수 가져오기 -->
+<!-- <select id="totalcount" resultType="java.lang.Integer" parameterType="SearchCriteria">
+	select count(*)
+	from board
+	<include refid="search"></include>
+</select> -->
+
+<select id="totalcount" resultType="java.lang.Integer" parameterType="SearchCriteria">
+	select count(*)
+	from board
+	<include refid="search"></include>
+</select>
+
+<!-- 게시글 번호에 해당하는 데이터(댓글)개수를 구해주는 sql -->
+<select id="replycnt" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	select count(*)
+	from reply
+	where bno = #{bno}
+</select>
+
+<!-- id에 해당하는 글 목록 가져오기 -->
+<select id="mypagecount" resultType="java.lang.Integer" parameterType="java.lang.String">
+	select count(*)
+	from board
+	where id = #{id}	
+</select>
+
+<!-- id에 해당하는 글 목록 가져오기 -->
+<select id="mypage" resultType="Board" parameterType="Criteria">
+	select bno, title, nickname, regdate, readcnt, id, image, genre
+	from (select rownum rnum, bno, title, nickname, regdate, readcnt, id, image, genre
+		  from(select * from board 
+			   order by regdate desc)
+		  	   )
+		  	   	 <!-- >= -->
+		  where rnum &gt;= #{pageStart} and 
+		  		 <!-- <= -->
+		        rnum &lt;= #{pageStart} + #{perPageNum} -1		
+</select>
+
+</mapper>

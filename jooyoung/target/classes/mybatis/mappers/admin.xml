@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="admin">
+
+<select id="userlist" resultType="User" parameterType="Criteria">
+	select *
+	from (select rownum rnum, id, nickname, name
+		  from userlist
+		  	   )
+		  	   <!-- rownum =  출력되는 결과물에 순차적인 번호를 달아주는 기능입니다.  -->
+		  	   	 <!-- >= -->
+		  where rnum &gt;= #{pageStart} and 
+		  		 <!-- <= -->
+		        rnum &lt;= #{pageStart} + #{perPageNum} -1
+</select>
+
+<select id="usercount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+	select count(*)
+	from userlist
+</select>
+
+<select id="userdetail" parameterType="java.lang.String" resultType="User">
+	select *
+	from userlist
+	where id = #{id}
+</select>
+
+<!-- 댓글 삭제 -->
+<delete id="userdelete" parameterType="java.lang.String">
+	delete from userlist
+	where id = #{id}
+</delete>
+</mapper>

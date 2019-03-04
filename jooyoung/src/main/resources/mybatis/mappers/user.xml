@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+
+<!-- 로그인 처리하는 SQL -->
+<select id="login" parameterType="java.lang.String" resultType="User">
+	select *
+	from userlist
+	where id = #{id} 
+</select>
+
+
+<!-- id 중복 검사 -->
+<select id="idcheck" parameterType="java.lang.String" resultType="java.lang.String">
+	select id
+	from userlist
+	where id = #{id}
+</select>
+
+<!-- nickname 중복 검사 -->
+<select id="nicknamecheck" parameterType="java.lang.String" resultType="java.lang.String">
+	select nickname
+	from userlist
+	where nickname = #{nickname}
+</select>
+
+
+<!-- 회원가입 -->
+<insert id="register" parameterType="User">
+	insert into userlist(id, pw, nickname, name, gender)
+	values(#{id}, #{pw}, #{nickname}, #{name}, #{gender})
+</insert>
+
+<!-- 회원 탈퇴 -->
+<delete id="delete" parameterType="java.lang.String">
+	delete from userlist
+	where id = #{id}
+</delete>
+
+<!-- 비밀번호 변경 -->
+<update id="update">
+	update userlist
+	set pw = #{pw}
+	where id = #{id}
+</update>
+
+<!-- 아이디 찾기 -->
+<select id="idfind" parameterType="java.lang.String" resultType="User">
+select id
+from userlist
+where name = #{name}
+</select>
+
+</mapper>

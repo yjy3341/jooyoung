@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reply">
+
+<!-- 댓글 저장 -->
+<insert id="register" parameterType="Reply">
+	insert into reply(rno, bno, id, nickname, replytext)
+	values(replyseq.nextval, #{bno}, #{id}, #{nickname}, #{replytext})
+</insert>
+
+<!-- 댓글 목록 -->
+<select id="reply" parameterType="java.lang.Integer" resultType="Reply">
+	select *
+	from reply
+	where bno = #{bno}
+</select>
+
+<!-- 댓글 삭제 -->
+<delete id="delete" parameterType="java.lang.Integer">
+	delete from reply
+	where rno = #{rno}
+</delete>
+
+<!-- 댓글 수정 -->
+<update id="update" parameterType="Reply">
+	update reply
+	set replytext = #{replytext}, regdate = sysdate
+	where rno = #{rno}
+</update>
+</mapper>

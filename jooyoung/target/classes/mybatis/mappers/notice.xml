@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="notice">
+
+<!-- 게시글 작성 -->
+<insert id="register" parameterType="Notice">
+	insert into notice(nno, title, content, id, nickname)
+	values(noticeseq.nextval, #{title}, #{content}, #{id}, #{nickname})
+</insert>
+
+<!-- 게시글 목록 -->
+<select id="notice" resultType="Notice" parameterType="Criteria">
+	select nno, title, nickname, regdate, readcnt, id
+	from (select rownum rnum, nno, title, nickname, regdate, readcnt, id
+		  from(select * 
+		  	   from notice 
+		  	   order by regdate desc)
+		  	   )
+		  	   <!-- rownum =  출력되는 결과물에 순차적인 번호를 달아주는 기능입니다.  -->
+		  	   	 <!-- >= -->
+		  where rnum &gt;= #{pageStart} and 
+		  		 <!-- <= -->
+		        rnum &lt;= #{pageStart} + #{perPageNum} -1
+</select>
+
+<!-- 상세보기 (조회수 1증가) -->
+<update id="updatecnt" parameterType="java.lang.Integer">
+	update notice
+	set readcnt = readcnt + 1
+	where nno = #{nno}
+</update>
+
+
+<!-- 상세보기(글 번호에 해당하는 데이터 가져오기 -->
+<select id="detail" parameterType="java.lang.Integer" resultType="Notice">
+	select *
+	from notice
+	where nno = #{nno}
+</select>
+
+<!-- 게시글 수정 -->
+<update id="update" parameterType="Notice">
+	update notice
+	set title = #{title}, content = #{content}, regdate = sysdate
+	where nno = #{nno} 
+</update>
+
+<!-- 게시글 삭제 -->
+<delete id="delete" parameterType="java.lang.Integer">
+	delete from notice
+	where nno = #{nno}
+</delete>
+
+
+<select id="totalcount" resultType="java.lang.Integer" parameterType="SearchCriteria">
+	select count(*)
+	from notice
+</select>
+
+</mapper>
